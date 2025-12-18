@@ -1,0 +1,15 @@
+name: Debug CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: List files
+        run: ls -R
+      - name: Check Java
+        run: java -version
