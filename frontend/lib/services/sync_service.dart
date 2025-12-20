@@ -11,8 +11,8 @@ class SyncService {
   
   Future<void> init() async {
     // Monitor connectivity
-    Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
-      if (!results.contains(ConnectivityResult.none)) {
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      if (result != ConnectivityResult.none) {
         performSync();
       }
     });
