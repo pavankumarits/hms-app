@@ -22,8 +22,6 @@ class _VisitFormScreenState extends State<VisitFormScreen> {
   final _treatmentCtrl = TextEditingController();
   final _feeCtrl = TextEditingController(text: "0.0");
 
-  // File Upload Logic
-  String? _uploadedFileId;
   bool _isUploading = false;
 
   void _uploadFile() async {
@@ -33,21 +31,21 @@ class _VisitFormScreenState extends State<VisitFormScreen> {
         setState(() => _isUploading = true);
         
         try {
-            // Note: This only works if Online. Offline file upload is complex.
-            // We assume user is online for file upload in this MVP.
             File file = File(result.files.single.path!);
             FormData formData = FormData.fromMap({
                 "file": await MultipartFile.fromFile(file.path, filename: result.files.single.name),
-                "visit_id": const Uuid().v4(), // Temporary, should link to actual visit if saved
+                "visit_id": const Uuid().v4(),
                 "file_type": "REPORT"
             });
             
             final api = ApiService();
             await api.client.post("/files/upload/", data: formData);
             
+            if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("File Uploaded!")));
         } catch (e) {
-             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Upload Failed: $e")));
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Upload Failed: $e")));
         } finally {
             setState(() => _isUploading = false);
         }
@@ -62,7 +60,7 @@ class _VisitFormScreenState extends State<VisitFormScreen> {
       final visit = VisitsCompanion.insert(
         id: newId,
         patientId: widget.patientId,
-        doctorId: "current-doctor-id", // Should get from AuthProvider
+        doctorId: "current-doctor-id",
         complaint: Value(_complaintCtrl.text),
         diagnosis: Value(_diagnosisCtrl.text),
         treatment: Value(_treatmentCtrl.text),

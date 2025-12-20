@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
-import '../services/api_service.dart'; // We might need a raw Dio here to avoid circular dep or pre-config issues
 import 'auth/login_screen.dart';
 
 class SetupScreen extends StatefulWidget {

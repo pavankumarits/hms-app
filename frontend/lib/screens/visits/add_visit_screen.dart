@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import '../../data/visit_service.dart';
 import '../../data/patient_service.dart';
 
@@ -36,7 +35,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
         });
       }
     } catch (e) {
-      if (kDebugMode) debugPrint("Error loading patients: $e");
+      // Error handling - patient loading failed silently
     }
   }
 
