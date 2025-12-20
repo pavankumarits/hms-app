@@ -40,17 +40,17 @@ dependencies:
   google_fonts: ^6.1.0
   flutter_svg: ^2.0.7
   data_table_2: ^2.5.8
-  fl_chart: ^0.66.0
-  intl: ^0.18.0
-  flutter_secure_storage: ^9.0.0
-  file_picker: ^6.1.1
+  fl_chart: ^1.1.1
+  intl: ^0.20.2
+  flutter_secure_storage: ^10.0.0
+  file_picker: ^10.3.8
   drift: ^2.14.0
   sqlite3: ^2.1.0
   sqlite3_flutter_libs: ^0.5.0
   path_provider: ^2.1.1
   path: ^1.8.3
-  workmanager: ^0.5.2
-  connectivity_plus: ^5.0.2
+  workmanager: ^0.9.0+3
+  connectivity_plus: ^7.0.0
   uuid: ^4.2.1
 
 dev_dependencies:
@@ -62,7 +62,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
   drift_dev: ^2.14.0
   build_runner: ^2.4.6
 
