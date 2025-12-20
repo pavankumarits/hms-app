@@ -29,6 +29,10 @@ jobs:
         working-directory: ./frontend
         run: flutter pub get
 
+      - name: Run Build Runner
+        working-directory: ./frontend
+        run: dart run build_runner build --delete-conflicting-outputs
+
       - name: Clean Build
         working-directory: ./frontend
         run: flutter clean
