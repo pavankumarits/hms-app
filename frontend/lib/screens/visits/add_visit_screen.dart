@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../../data/visit_service.dart';
 import '../../data/patient_service.dart';
-import '../../providers/auth_provider.dart';
-import 'package:provider/provider.dart';
 
 class AddVisitScreen extends StatefulWidget {
   const AddVisitScreen({super.key});
@@ -18,8 +17,6 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
   final _treatmentController = TextEditingController();
   final _billingController = TextEditingController(text: '0.0');
   
-  // For Patient Search/Selection (Simplified for this MVP)
-  // Ideally this would be a search delegate or typeahead
   List<dynamic> _patients = [];
   int? _selectedPatientId;
   bool _isLoading = false;
@@ -39,7 +36,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
         });
       }
     } catch (e) {
-      // Handle error
+      if (kDebugMode) debugPrint("Error loading patients: $e");
     }
   }
 
@@ -49,23 +46,12 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
       try {
         final visitData = {
           'patient_id': _selectedPatientId,
-          'doctor_id': 1, // TODO: Get from current user but backend needs ID not token here usually? 
-          // Wait, backend create_visit: doctor_id: int. 
-          // But our API endpoint can take current_user from token, yet schema requires doctor_id explicitly?
-           // Let's check backend schema. 
-           // VisitCreate requires doctor_id. 
-           // We should probably get it from AuthProvider (User ID).
-           // For now, hardcoding 1 (Admin) or getting from AuthProvider if available.
+          'doctor_id': 1, 
           'complaint': _complaintController.text,
           'diagnosis': _diagnosisController.text,
           'treatment': _treatmentController.text,
           'billing_amount': double.tryParse(_billingController.text) ?? 0.0,
         };
-        
-        // Quick fix for doctor_id: The backend VisitCreate model requires it.
-        // In a real app, the backend usually assigns current_user.id as the doctor if not specified/admin.
-        // We will pass 1 for now or need to fetch /me and store ID in AuthProvider.
-        // Let's assume AuthProvider has it or we pass a placeholder.
         
         await VisitService().createVisit(visitData);
         

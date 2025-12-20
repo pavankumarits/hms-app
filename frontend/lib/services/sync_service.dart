@@ -1,6 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
-import 'package:uuid/uuid.dart';
 import 'api_service.dart';
 import 'database_helper.dart';
 
@@ -20,7 +19,7 @@ class SyncService {
   }
   
   Future<void> performSync() async {
-    if (kDebugMode) print("Starting Sync...");
+    if (kDebugMode) debugPrint("Starting Sync...");
     
     // 1. Fetch pending records
     final pendingPatients = await _db.getPendingPatients();
@@ -69,10 +68,10 @@ class SyncService {
         await _db.markPatientSynced(p.id);
       }
       
-      if (kDebugMode) print("Sync Completed!");
+      if (kDebugMode) debugPrint("Sync Completed!");
       
     } catch (e) {
-      print("Sync Failed: $e");
+      debugPrint("Sync Failed: $e");
     }
   }
 }
