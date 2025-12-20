@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import 'package:drift/drift.dart' show Value;
+import 'package:drift/drift.dart';
 import '../services/database_helper.dart';
 
 class BillingFormScreen extends StatefulWidget {
@@ -22,13 +22,13 @@ class _BillingFormScreenState extends State<BillingFormScreen> {
       final db = AppDatabase();
       final newId = const Uuid().v4();
       
-      final bill = BillsCompanion.insert(
+      final bill = Bill(
         id: newId,
         visitId: widget.visitId,
         amount: double.tryParse(_amountCtrl.text) ?? 0.0,
-        status: Value(_status),
-        paymentMethod: Value(_method),
-        syncStatus: const Value('pending'),
+        status: _status,
+        paymentMethod: _method,
+        syncStatus: 'pending',
       );
       
       await db.into(db.bills).insert(bill);

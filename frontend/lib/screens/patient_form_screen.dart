@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import 'package:drift/drift.dart' show Value;
+import 'package:drift/drift.dart';
 import '../services/database_helper.dart';
 
 class PatientFormScreen extends StatefulWidget {
@@ -13,7 +13,6 @@ class PatientFormScreen extends StatefulWidget {
 class _PatientFormScreenState extends State<PatientFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
-  final _ageCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   String _gender = 'Male';
   
@@ -22,13 +21,17 @@ class _PatientFormScreenState extends State<PatientFormScreen> {
       final db = AppDatabase();
       final newId = const Uuid().v4();
       
-      final patient = PatientsCompanion.insert(
+      final patient = Patient(
         id: newId,
+        patientUiid: null,
         name: _nameCtrl.text,
         gender: _gender,
-        dob: DateTime.now().subtract(const Duration(days: 365 * 20)), // Dummy DOB
-        phone: Value(_phoneCtrl.text),
-        syncStatus: const Value('pending'),
+        dob: DateTime.now().subtract(const Duration(days: 365 * 20)),
+        phone: _phoneCtrl.text.isEmpty ? null : _phoneCtrl.text,
+        address: null,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        syncStatus: 'pending',
       );
       
       await db.insertPatient(patient);

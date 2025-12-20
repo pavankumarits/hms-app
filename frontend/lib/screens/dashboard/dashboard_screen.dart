@@ -8,7 +8,6 @@ import '../visits/visit_list_screen.dart';
 import 'audit_log_screen.dart';
 import 'file_upload_screen.dart';
 import '../../data/api_client.dart';
-import 'package:dio/dio.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
