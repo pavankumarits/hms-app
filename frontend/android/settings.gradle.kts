@@ -2,9 +2,11 @@ pluginManagement {
     val flutterSdkPath =
         run {
             val properties = java.util.Properties()
-            val localPropertiesFile = file("local.properties")
+            val localPropertiesFile = java.io.File("local.properties")
             if (localPropertiesFile.exists()) {
-                localPropertiesFile.inputStream().use { properties.load(it) }
+                java.io.FileInputStream(localPropertiesFile).use { inputStream ->
+                    properties.load(inputStream)
+                }
             }
             val flutterSdkPath = properties.getProperty("flutter.sdk")
                 ?: System.getenv("FLUTTER_ROOT")
