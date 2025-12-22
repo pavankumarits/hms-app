@@ -33,9 +33,12 @@ jobs:
         working-directory: ./frontend
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Clean Build
+      - name: Strict Clean Rebuild
         working-directory: ./frontend
-        run: flutter clean
+        run: |
+          flutter clean
+          flutter pub cache repair
+          flutter pub get
 
       - name: Analyze Project
         working-directory: ./frontend
@@ -43,7 +46,7 @@ jobs:
 
       - name: Build APK
         working-directory: ./frontend
-        run: flutter build apk --release --verbose
+        run: flutter build apk --release --verbose -- --stacktrace --info --warning-mode all
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
