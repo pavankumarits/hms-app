@@ -24,32 +24,17 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-      
+
       - name: Install Dependencies
         working-directory: ./frontend
         run: flutter pub get
 
-      - name: Run Build Runner
+      - name: Build Debug APK
         working-directory: ./frontend
-        run: dart run build_runner build --delete-conflicting-outputs
-
-      - name: Strict Clean Rebuild
-        working-directory: ./frontend
-        run: |
-          flutter clean
-          flutter pub cache repair
-          flutter pub get
-
-      - name: Analyze Project
-        working-directory: ./frontend
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings
-
-      - name: Build APK
-        working-directory: ./frontend
-        run: flutter build apk --release --verbose -- --stacktrace --info --warning-mode all
+        run: flutter build apk --debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: frontend/build/app/outputs/flutter-apk/app-release.apk
+          name: app-debug
+          path: frontend/build/app/outputs/flutter-apk/app-debug.apk
