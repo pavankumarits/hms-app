@@ -33,7 +33,7 @@ call venv\Scripts\activate
 :: Start Uvicorn in background? No, keep it visible for logs.
 :: We use 'start' to spawn separate windows.
 
-start "HMS Backend" cmd /k "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+start "HMS Backend" cmd /k "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
 
 :: 3. Start Cloudflare Tunnel
 echo.
@@ -43,7 +43,7 @@ echo NOTE: Since you are using the Free Quick Tunnel,
 echo the URL will change unless you configured a Named Tunnel.
 echo ---------------------------------------------------
 
-start "HMS Public Tunnel" cmd /k "cloudflared tunnel --url http://localhost:8000"
+start "HMS Public Tunnel" cmd /k "cloudflared.exe tunnel --url http://localhost:8000"
 
 echo.
 echo ====================================================

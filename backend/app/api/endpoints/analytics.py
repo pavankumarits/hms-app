@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -13,7 +13,7 @@ from app.models.user import User
 
 router = APIRouter()
 
-@router.get("/graph-data", response_model=Dict[str, List[int]])
+@router.get("/graph-data", response_model=Dict[str, list[int]])
 async def get_graph_data(
     period: str = "week", # day, week, month, year
     db: AsyncSession = Depends(get_db),

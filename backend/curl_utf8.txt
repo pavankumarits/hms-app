@@ -1,0 +1,25 @@
+﻿cmd : * Uses proxy env variable no_proxy == '*.azureedge.net'
+At line:1 char:1
++ cmd /c curl -v http://localhost:8000/docs > backend\curl_out.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (* Uses proxy en....azureedge.net':String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+* Host localhost:8000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying [::1]:8000...
+*   Trying 127.0.0.1:8000...
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0* connect to ::1 port 8000 from :: port 
+50096 failed: Connection refused
+* connect to 127.0.0.1 port 8000 from 0.0.0.0 port 50097 failed: Connection refused
+* Failed to connect to localhost port 8000 after 2592 ms: Could not connect to server
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+* closing connection #0
+curl: (7) Failed to connect to localhost port 8000 after 2592 ms: Could not connect to server

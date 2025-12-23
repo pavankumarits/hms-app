@@ -6,6 +6,9 @@ class Settings(BaseSettings):
     TUNNEL_URL: Optional[str] = None # Cloudflare Tunnel URL
     API_V1_STR: str = "/api/v1"
     
+    # CORS
+    BACKEND_CORS_ORIGINS: list[str] = ["*"]
+    
     # Text
     SECRET_KEY: str = "YOUR_SECRET_KEY_HERE"  # Change this in production!
     ALGORITHM: str = "HS256"

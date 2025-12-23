@@ -20,7 +20,7 @@ class SetupResponse(BaseModel):
     hospital_id: str
     message: str
 
-@router.post("/setup", response_model=SetupResponse)
+@router.post("", response_model=SetupResponse)
 async def setup_hospital(
     payload: SetupRequest, 
     db: AsyncSession = Depends(get_db)

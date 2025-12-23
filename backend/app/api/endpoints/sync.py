@@ -7,7 +7,7 @@ from app.models.patient import Patient
 from app.models.visit import Visit
 from app.models.bill import Bill
 from app.models.audit import AuditLog
-from app.core.security import get_current_user
+from app.api.deps import get_current_user
 from app.core.memory_queue import add_to_queue
 
 from app.schemas.patient import PatientInDBBase

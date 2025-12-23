@@ -23,6 +23,16 @@ class ApiService {
            options.baseUrl = savedUrl;
         }
 
+        // Ensure /api/v1 suffix
+        if (!options.baseUrl.endsWith('/api/v1')) {
+           // Handle potential trailing slash in root domain
+           if (options.baseUrl.endsWith('/')) {
+              options.baseUrl = '${options.baseUrl}api/v1';
+           } else {
+              options.baseUrl = '${options.baseUrl}/api/v1';
+           }
+        }
+
         // 2. Auth Token & Hospital ID
         final token = await _storage.read(key: 'auth_token');
         final hospitalId = await _storage.read(key: 'hospital_id');
