@@ -19,6 +19,7 @@ from app.core.audit_utils import create_audit_log
 async def login_access_token(
     db: AsyncSession = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
+    print(f"DEBUG LOGIN Attempt: username='{form_data.username}', password='{form_data.password}'")
     result = await db.execute(select(User).filter(User.username == form_data.username))
     user = result.scalars().first()
     

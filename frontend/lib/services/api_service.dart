@@ -34,7 +34,7 @@ class ApiService {
         }
 
         // 2. Auth Token & Hospital ID
-        final token = await _storage.read(key: 'auth_token');
+        final token = await _storage.read(key: 'access_token');
         final hospitalId = await _storage.read(key: 'hospital_id');
         
         if (token != null) {
