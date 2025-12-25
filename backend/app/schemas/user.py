@@ -1,5 +1,4 @@
-from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class UserBase(BaseModel):
     username: Optional[str] = None
@@ -15,11 +14,10 @@ class UserUpdate(UserBase):
     password: Optional[str] = None
 
 class UserInDBBase(UserBase):
-    id: Optional[int] = None
+    id: Optional[str] = None # ID is a UUID string, not int
     username: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class User(UserInDBBase):
     pass
