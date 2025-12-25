@@ -35,8 +35,8 @@ call venv\Scripts\activate
 
 start "HMS Backend" cmd /k "venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload"
 
-echo Waiting 10 seconds for Backend to initialize...
-timeout /t 10
+echo Waiting 20 seconds for Backend to initialize...
+timeout /t 20
 
 start "HMS Public Tunnel" cmd /k "cloudflared.exe tunnel --url http://127.0.0.1:8000"
 
