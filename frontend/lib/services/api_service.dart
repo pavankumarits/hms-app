@@ -11,8 +11,8 @@ class ApiService {
     _dio = Dio(BaseOptions(
       // Default to Config, but will be overwritten by interceptor or init
       baseUrl: AppConfig.apiBaseUrl, 
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
+      connectTimeout: const Duration(seconds: 60),
+      receiveTimeout: const Duration(seconds: 60),
     ));
 
     _dio.interceptors.add(InterceptorsWrapper(
@@ -47,7 +47,13 @@ class ApiService {
         return handler.next(options);
       },
       onError: (DioException e, handler) {
-        if (kDebugMode) print("API Error: ${e.message}");
+        if (kDebugMode) {
+          print("API Error: ${e.message}");
+          print("Error Type: ${e.type}");
+          if (e.response != null) {
+            print("Error Response: ${e.response?.data}");
+          }
+        }
         return handler.next(e);
       }
     ));

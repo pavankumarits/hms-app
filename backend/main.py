@@ -30,7 +30,7 @@ async def startup_event():
 
 async def background_queue_processor():
     """ Periodically retry failed syncs """
-    from app.db.session import SessionLocal # Use sync session or async session factory? 
+    from app.db.session import AsyncSessionLocal 
     # Async session is complex here without request context. 
     # For simplicity, we just print/pass or try to reuse logic if possible.
     # Actually, reusing the async 'sync_data' logic is hard because of Dependency Injection.

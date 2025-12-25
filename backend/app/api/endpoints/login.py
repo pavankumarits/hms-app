@@ -28,7 +28,11 @@ async def login_access_token(
         raise HTTPException(status_code=400, detail="Inactive user")
     
     # Log Login
-    await create_audit_log(db, user.id, "LOGIN", "AUTH", "User logged in")
+    try:
+        await create_audit_log(db, user.id, "LOGIN", "AUTH", "User logged in")
+    except Exception as e:
+        # Don't fail login if audit logging fails
+        print(f"Failed to create audit log: {e}")
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = security.create_access_token(

@@ -43,6 +43,10 @@ class AuthProvider with ChangeNotifier {
       return true;
     } catch (e) {
       print('Login Error: $e');
+      if (e is DioException) {
+         print('DioError: ${e.message}');
+         print('DioError Response: ${e.response?.data}');
+      }
       _isLoading = false;
       _isAuthenticated = false;
       notifyListeners();

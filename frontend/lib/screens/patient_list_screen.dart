@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/database_helper.dart';
 import 'patient_form_screen.dart';
+import 'visit_form_screen.dart';
 
 class PatientListScreen extends StatefulWidget {
   const PatientListScreen({super.key});
@@ -44,7 +45,25 @@ class _PatientListScreenState extends State<PatientListScreen> {
                 subtitle: Text("ID: ${p.patientUiid ?? 'Pending'} | Status: ${p.syncStatus}"),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
-                   // Navigate to details or visit creation
+                   showModalBottomSheet(
+                     context: context,
+                     builder: (context) => Container(
+                       padding: const EdgeInsets.all(16),
+                       child: Column(
+                         mainAxisSize: MainAxisSize.min,
+                         children: [
+                           ListTile(
+                             leading: const Icon(Icons.medical_services),
+                             title: const Text("New Visit"),
+                             onTap: () {
+                               Navigator.pop(context);
+                               Navigator.push(context, MaterialPageRoute(builder: (_) => VisitFormScreen(patientId: p.id)));
+                             },
+                           ),
+                         ],
+                       ),
+                     ),
+                   );
                 },
               );
             },
