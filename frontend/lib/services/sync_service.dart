@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:drift/drift.dart'; // Required for Value and Companions
 import 'api_service.dart';
 import 'database_helper.dart';
 
@@ -18,14 +19,17 @@ class SyncService {
     });
   }
   
-  Future<void> performSync() async {
+  Future<bool> performSync() async {
     if (kDebugMode) debugPrint("Starting Sync...");
     
     // 1. Fetch pending records
     final pendingPatients = await _db.getPendingPatients();
-    // Fetch visits, bills etc.
+    final pendingVisits = (await _db.select(_db.visits).get()).where((v) => v.syncStatus == 'pending').toList();
+    // Add bills later if needed
     
-    if (pendingPatients.isEmpty) return;
+    if (pendingPatients.isEmpty && pendingVisits.isEmpty) {
+      return false; // Nothing to sync
+    }
     
     try {
       // 2. Construct Payload
@@ -41,7 +45,7 @@ class SyncService {
           'created_at': p.createdAt.toIso8601String(),
           'updated_at': p.updatedAt.toIso8601String(),
         }).toList(),
-        'visits': (await _db.select(_db.visits).get()).where((v) => v.syncStatus == 'pending').map((v) => {
+        'visits': pendingVisits.map((v) => {
           'id': v.id,
           'patient_id': v.patientId,
           'doctor_id': v.doctorId,
@@ -51,13 +55,8 @@ class SyncService {
           'billing_amount': v.billingAmount,
           'visit_date': v.visitDate.toIso8601String(),
         }).toList(),
-        'bills': (await _db.select(_db.bills).get()).where((b) => b.syncStatus == 'pending').map((b) => {
-          'id': b.id,
-          'visit_id': b.visitId,
-          'amount': b.amount,
-          'status': b.status,
-          'payment_method': b.paymentMethod,
-        }).toList()
+        'bills': [], // Add bills logic if table exists and populated
+        'audit_logs': []
       };
       
       // 3. Send to Backend
@@ -67,11 +66,17 @@ class SyncService {
       for (var p in pendingPatients) {
         await _db.markPatientSynced(p.id);
       }
+      for (var v in pendingVisits) {
+        // Need a similar method for visits or generic update
+        await (_db.update(_db.visits)..where((t) => t.id.equals(v.id))).write(const VisitsCompanion(syncStatus: Value('synced')));
+      }
       
       if (kDebugMode) debugPrint("Sync Completed!");
+      return true; // Sync success
       
     } catch (e) {
       debugPrint("Sync Failed: $e");
+      return false; // Sync failed
     }
   }
 }

@@ -32,7 +32,7 @@ async def get_current_user(
             detail="Could not validate credentials",
         )
     
-    result = await db.execute(select(User).filter(User.id == int(token_data)))
+    result = await db.execute(select(User).filter(User.id == token_data))
     user = result.scalars().first()
     
     if not user:
