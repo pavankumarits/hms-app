@@ -9,8 +9,8 @@ if "+pymysql" not in url and "+aiomysql" not in settings.DATABASE_URL:
 engine = create_engine(url)
 
 with engine.connect() as conn:
-    result = conn.execute(text("SELECT username, role, hospital_id FROM users"))
+    result = conn.execute(text("SELECT username, role, hospital_id, is_active FROM users"))
     users = result.fetchall()
     print(f"Found {len(users)} users:")
     for u in users:
-        print(f"User: {u.username}, Role: {u.role}")
+        print(f"User: {u.username}, Role: {u.role}, Active: {u.is_active}")
