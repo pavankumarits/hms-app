@@ -1,6 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/sync_service.dart'; // Added
+import '../services/database_helper.dart'; // Added
 import '../core/theme.dart';
 import 'patient_list_screen.dart';
 
@@ -187,7 +189,6 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                    _triggerSync();
                 },
                 style: ElevatedButton.styleFrom(
-                  elevation: 2,
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
