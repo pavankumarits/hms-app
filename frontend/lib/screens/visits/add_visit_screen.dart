@@ -91,23 +91,16 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
     }
   }
 
-  InputDecoration _cleanDecoration(String label, IconData icon, {String? hintText}) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hintText,
-      hintStyle: TextStyle(color: Colors.grey.withOpacity(0.6)), // Light shadow text effect
-      prefixIcon: Icon(icon, size: 20),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      filled: true,
-      fillColor: Colors.grey[50],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New OPD Visit'), elevation: 0),
+      backgroundColor: const Color(0xFF141414), // Dark Matte Background
+      appBar: AppBar(
+        title: const Text('New OPD Visit', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
@@ -116,16 +109,30 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text("Visit Details", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
+                // Section Header
+                const Text(
+                  "Visit Details",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF4DB6AC), // Muted Teal
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Divider(color: Color(0xFF2E2E2E), thickness: 1), // Thin divider
                 const SizedBox(height: 20),
 
                 // Patient Dropdown
                 DropdownButtonFormField<String>(
                   value: _selectedPatientId,
+                  dropdownColor: const Color(0xFF1E1E1E), // Dark dropdown menu
                   decoration: _cleanDecoration('Select Patient', Icons.person_search),
+                  style: const TextStyle(color: Color(0xFFEAEAEA)), // Off-white text
                   items: _patients.map((p) => DropdownMenuItem<String>(
                     value: p.id,
-                    child: Text('${p.name} (${p.patientUiid ?? "New"})', overflow: TextOverflow.ellipsis),
+                    child: Text('${p.name} (${p.patientUiid ?? "New"})', 
+                      style: const TextStyle(color: Color(0xFFEAEAEA)),
+                      overflow: TextOverflow.ellipsis),
                   )).toList(),
                   onChanged: (value) => setState(() => _selectedPatientId = value),
                   validator: (val) => val == null ? 'Required' : null,
@@ -136,7 +143,8 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                 TextFormField(
                   controller: _complaintController,
                   decoration: _cleanDecoration('Chief Complaint', Icons.sick),
-                  maxLines: 2,
+                  style: const TextStyle(color: Color(0xFFEAEAEA)),
+                  maxLines: 1, 
                   validator: (val) => val!.trim().isEmpty ? 'Required' : null,
                 ),
                 const SizedBox(height: 16),
@@ -145,36 +153,55 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                 TextFormField(
                   controller: _diagnosisController,
                   decoration: _cleanDecoration('Diagnosis', Icons.local_hospital),
-                  maxLines: 2,
+                  style: const TextStyle(color: Color(0xFFEAEAEA)),
+                  maxLines: 1,
                 ),
                 const SizedBox(height: 16),
 
-                // Treatment
-                TextFormField(
-                  controller: _treatmentController,
-                  decoration: _cleanDecoration('Treatment / Rx', Icons.medication),
-                  maxLines: 4,
+                // Treatment / Rx (Fixed Height Box)
+                SizedBox(
+                  height: 140, // Exact height constraint
+                  child: TextFormField(
+                    controller: _treatmentController,
+                    decoration: _cleanDecoration('Treatment / Rx', Icons.medication),
+                    style: const TextStyle(color: Color(0xFFEAEAEA)),
+                    maxLines: null, // Allow multi-line
+                    expands: true, // Fill the SizedBox
+                    textAlignVertical: TextAlignVertical.top,
+                  ),
                 ),
                 const SizedBox(height: 16),
 
-                // Billing
-                TextFormField(
-                  controller: _billingController,
-                  decoration: _cleanDecoration('Consultation Fee', Icons.attach_money, hintText: '0.0'),
-                  keyboardType: TextInputType.number,
+                // Consultation Fee (Exact same height as Treatment)
+                SizedBox(
+                  height: 140, // Exact height constraint matching Treatment
+                  child: TextFormField(
+                    controller: _billingController,
+                    decoration: _cleanDecoration('Consultation Fee', Icons.currency_rupee, hintText: 'Enter fee'), // Updated hint
+                    style: const TextStyle(color: Color(0xFFEAEAEA)),
+                    keyboardType: TextInputType.number,
+                    maxLines: null, // Similar behavior for size
+                    expands: true, // Fill the SizedBox
+                    textAlignVertical: TextAlignVertical.top, // Align top like Treatment
+                  ),
                 ),
                 const SizedBox(height: 32),
 
-                // Submit
+                // Submit Button
                 SizedBox(
-                  height: 50,
+                  height: 56, // Large button
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _submit,
                     style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      backgroundColor: Theme.of(context).primaryColor,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      backgroundColor: const Color(0xFF00897B), // Teal
+                      foregroundColor: Colors.white,
+                      elevation: 4,
+                      shadowColor: Colors.black45,
                     ),
-                    child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('Save Visit Record', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                    child: _isLoading 
+                      ? const CircularProgressIndicator(color: Colors.white) 
+                      : const Text('Save Visit Record', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
@@ -182,6 +209,31 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  InputDecoration _cleanDecoration(String label, IconData icon, {String? hintText}) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hintText,
+      labelStyle: const TextStyle(color: Color(0xFF9E9E9E)), // Muted Grey
+      hintStyle: const TextStyle(color: Color(0xFF9E9E9E)),
+      prefixIcon: Icon(icon, size: 22, color: const Color(0xFF4DB6AC)), // Muted Teal Icon
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFF2E2E2E)), // Soft Grey
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFF2E2E2E)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFF26A69A), width: 1.5), // Thin Teal highlight
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      filled: true,
+      fillColor: const Color(0xFF1E1E1E), // Dark Grey Surface
     );
   }
 }

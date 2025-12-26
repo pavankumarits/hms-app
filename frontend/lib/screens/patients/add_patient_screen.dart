@@ -101,24 +101,39 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
     }
   }
 
-  // Reusable Decoration for clean UI
+  // Reusable Decoration for clean UI (Dark Theme)
   InputDecoration _cleanDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: Icon(icon, size: 20),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      labelStyle: const TextStyle(color: Color(0xFF9E9E9E)), // Muted Grey
+      prefixIcon: Icon(icon, size: 22, color: const Color(0xFF4DB6AC)), // Muted Teal
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFF2E2E2E)), // Soft Grey
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFF2E2E2E)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFF26A69A), width: 1.5), // Thin Teal
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       filled: true,
-      fillColor: Colors.grey[50],
+      fillColor: const Color(0xFF1E1E1E), // Dark Grey Surface
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF141414), // Dark Matte Background
       appBar: AppBar(
-        title: const Text('New Patient Registration'),
+        title: const Text('New Patient Registration', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -130,14 +145,21 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
               children: [
                 const Text(
                   "Patient Details",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF4DB6AC), // Muted Teal
+                  ),
                 ),
+                const SizedBox(height: 8),
+                const Divider(color: Color(0xFF2E2E2E), thickness: 1),
                 const SizedBox(height: 20),
 
                 // Name
                 TextFormField(
                   controller: _nameController,
                   decoration: _cleanDecoration('Full Name', Icons.person),
+                  style: const TextStyle(color: Color(0xFFEAEAEA)), // Off-white text
                   textCapitalization: TextCapitalization.words,
                   validator: (value) => value!.trim().isEmpty ? 'Please enter name' : null,
                 ),
@@ -149,10 +171,12 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         value: _selectedGender,
+                        dropdownColor: const Color(0xFF1E1E1E),
                         decoration: _cleanDecoration('Gender', Icons.wc),
+                        style: const TextStyle(color: Color(0xFFEAEAEA)),
                         items: ['Male', 'Female', 'Other'].map((label) => DropdownMenuItem(
                           value: label,
-                          child: Text(label),
+                          child: Text(label, style: const TextStyle(color: Color(0xFFEAEAEA))),
                         )).toList(),
                         onChanged: (value) => setState(() => _selectedGender = value!),
                       ),
@@ -165,6 +189,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           child: TextFormField(
                             controller: _dateController,
                             decoration: _cleanDecoration('Date of Birth', Icons.calendar_today),
+                            style: const TextStyle(color: Color(0xFFEAEAEA)),
                             validator: (val) => val!.isEmpty ? 'Required' : null,
                           ),
                         ),
@@ -178,6 +203,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                 TextFormField(
                   controller: _phoneController,
                   decoration: _cleanDecoration('Mobile Number', Icons.phone),
+                  style: const TextStyle(color: Color(0xFFEAEAEA)),
                   keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(height: 16),
@@ -186,22 +212,26 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                 TextFormField(
                   controller: _addressController,
                   decoration: _cleanDecoration('Address / City', Icons.home),
+                  style: const TextStyle(color: Color(0xFFEAEAEA)),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 32),
 
                 // Submit Button
                 SizedBox(
-                  height: 50,
+                  height: 56, // Large button
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _submit,
                     style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      backgroundColor: Theme.of(context).primaryColor,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      backgroundColor: const Color(0xFF00897B),
+                      foregroundColor: Colors.white,
+                      elevation: 4,
+                      shadowColor: Colors.black45,
                     ),
                     child: _isLoading
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : const Text('Save Patient', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                        ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        : const Text('Save Patient', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
