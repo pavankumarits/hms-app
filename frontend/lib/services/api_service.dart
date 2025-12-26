@@ -84,6 +84,27 @@ class ApiService {
     }
   }
 
+  // Data Fetching (Pull)
+  Future<List<dynamic>> fetchPatients() async {
+    try {
+      final response = await _dio.get('/patients/');
+      return response.data; // Returns List<dynamic>
+    } catch (e) {
+      if (kDebugMode) print("Fetch Patients Error: $e");
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> fetchVisits() async {
+    try {
+      final response = await _dio.get('/visits/');
+      return response.data;
+    } catch (e) {
+      if (kDebugMode) print("Fetch Visits Error: $e");
+      return [];
+    }
+  }
+
   // Analytics
   Future<Map<String, dynamic>> fetchGraphData() async {
     try {

@@ -21,6 +21,62 @@ class SyncService {
   
   Future<bool> performSync() async {
     if (kDebugMode) debugPrint("Starting Sync...");
+    bool pullSuccess = true;
+    
+    // --- PULL PHASE ---
+    try {
+      if (kDebugMode) debugPrint("Pulling data from server...");
+      
+      // 1. Fetch Remote Data
+      final remotePatients = await _apiService.fetchPatients();
+      final remoteVisits = await _apiService.fetchVisits();
+      
+      // 2. Process Patients
+      if (remotePatients.isNotEmpty) {
+        final List<Patient> patientsToInsert = remotePatients.map((json) {
+           return Patient(
+             id: json['id'],
+             patientUiid: json['patient_uiid'],
+             name: json['name'],
+             gender: json['gender'],
+             dob: DateTime.parse(json['dob']),
+             phone: json['phone'],
+             address: json['address'],
+             createdAt: DateTime.parse(json['created_at']),
+             updatedAt: DateTime.parse(json['updated_at']),
+             syncStatus: 'synced', // Coming from server, so it's synced
+           );
+        }).toList();
+        await _db.batchInsertPatients(patientsToInsert);
+      }
+
+      // 3. Process Visits
+      if (remoteVisits.isNotEmpty) {
+        final List<Visit> visitsToInsert = remoteVisits.map((json) {
+           return Visit(
+             id: json['id'],
+             patientId: json['patient_id'],
+             doctorId: json['doctor_id'],
+             complaint: json['complaint'],
+             diagnosis: json['diagnosis'],
+             treatment: json['treatment'],
+             billingAmount: (json['billing_amount'] as num).toDouble(),
+             visitDate: DateTime.parse(json['visit_date']),
+             syncStatus: 'synced',
+           );
+        }).toList();
+        await _db.batchInsertVisits(visitsToInsert);
+      }
+      
+      if (kDebugMode) debugPrint("Pull Completed. Patients: ${remotePatients.length}, Visits: ${remoteVisits.length}");
+      
+    } catch (e) {
+      pullSuccess = false;
+      if (kDebugMode) debugPrint("Pull Failed: $e");
+      // Decide: Stop or Continue? Let's continue to Push phase to ensure data safety.
+    }
+
+    // --- PUSH PHASE ---
     
     // 1. Fetch pending records
     final pendingPatients = await _db.getPendingPatients();
@@ -28,7 +84,7 @@ class SyncService {
     // Add bills later if needed
     
     if (pendingPatients.isEmpty && pendingVisits.isEmpty) {
-      return false; // Nothing to sync
+      return pullSuccess; // Return status of pull if nothing to push
     }
     
     try {
@@ -71,11 +127,11 @@ class SyncService {
         await (_db.update(_db.visits)..where((t) => t.id.equals(v.id))).write(const VisitsCompanion(syncStatus: Value('synced')));
       }
       
-      if (kDebugMode) debugPrint("Sync Completed!");
-      return true; // Sync success
+      if (kDebugMode) debugPrint("Push Completed!");
+      return true; // Push success
       
     } catch (e) {
-      debugPrint("Sync Failed: $e");
+      debugPrint("Push Failed: $e");
       return false; // Sync failed
     }
   }

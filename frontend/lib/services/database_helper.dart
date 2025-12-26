@@ -64,6 +64,19 @@ class AppDatabase extends _$AppDatabase {
   // Sync Query
   Future<List<Patient>> getPendingPatients() => (select(patients)..where((tbl) => tbl.syncStatus.equals('pending'))).get();
   Future<void> markPatientSynced(String id) => (update(patients)..where((tbl) => tbl.id.equals(id))).write(const PatientsCompanion(syncStatus: Value('synced')));
+  
+  // Bulk Upsert (For Pull Sync)
+  Future<void> batchInsertPatients(List<Patient> list) async {
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(patients, list);
+    });
+  }
+  
+  Future<void> batchInsertVisits(List<Visit> list) async {
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(visits, list);
+    });
+  }
 }
 
 LazyDatabase _openConnection() {
