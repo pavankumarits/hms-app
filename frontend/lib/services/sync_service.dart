@@ -29,7 +29,10 @@ class SyncService {
       
       // 1. Fetch Remote Data
       final remotePatients = await _apiService.fetchPatients();
+      if (kDebugMode) debugPrint("[Sync] Received Patients: $remotePatients");
+
       final remoteVisits = await _apiService.fetchVisits();
+      if (kDebugMode) debugPrint("[Sync] Received Visits: $remoteVisits");
       
       // 2. Process Patients
       if (remotePatients.isNotEmpty) {
