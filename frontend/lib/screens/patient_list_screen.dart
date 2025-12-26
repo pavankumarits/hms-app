@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/database_helper.dart';
+import '../services/sync_service.dart';
+import '../services/api_service.dart';
 import 'patients/add_patient_screen.dart'; // Correct path
 import 'visits/add_visit_screen.dart';
 import 'patients/patient_history_screen.dart';
