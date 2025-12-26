@@ -125,9 +125,10 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                 // Patient Dropdown
                 DropdownButtonFormField<String>(
                   value: _selectedPatientId,
-                  dropdownColor: const Color(0xFF1E1E1E), // Dark dropdown menu
+                  isExpanded: true, // Fix overflow error
+                  dropdownColor: const Color(0xFF1E1E1E), 
                   decoration: _cleanDecoration('Select Patient', Icons.person_search),
-                  style: const TextStyle(color: Color(0xFFEAEAEA)), // Off-white text
+                  style: const TextStyle(color: Color(0xFFEAEAEA)),
                   items: _patients.map((p) => DropdownMenuItem<String>(
                     value: p.id,
                     child: Text('${p.name} (${p.patientUiid ?? "New"})', 
@@ -160,30 +161,25 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
 
                 // Treatment / Rx (Fixed Height Box)
                 SizedBox(
-                  height: 140, // Exact height constraint
+                  height: 140, // Keep this big as requested
                   child: TextFormField(
                     controller: _treatmentController,
                     decoration: _cleanDecoration('Treatment / Rx', Icons.medication),
                     style: const TextStyle(color: Color(0xFFEAEAEA)),
-                    maxLines: null, // Allow multi-line
-                    expands: true, // Fill the SizedBox
+                    maxLines: null, 
+                    expands: true, 
                     textAlignVertical: TextAlignVertical.top,
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // Consultation Fee (Exact same height as Treatment)
-                SizedBox(
-                  height: 140, // Exact height constraint matching Treatment
-                  child: TextFormField(
-                    controller: _billingController,
-                    decoration: _cleanDecoration('Consultation Fee', Icons.currency_rupee, hintText: 'Enter fee'), // Updated hint
-                    style: const TextStyle(color: Color(0xFFEAEAEA)),
-                    keyboardType: TextInputType.number,
-                    maxLines: null, // Similar behavior for size
-                    expands: true, // Fill the SizedBox
-                    textAlignVertical: TextAlignVertical.top, // Align top like Treatment
-                  ),
+                // Consultation Fee (Back to Normal Size)
+                TextFormField(
+                  controller: _billingController,
+                  decoration: _cleanDecoration('Consultation Fee', Icons.currency_rupee, hintText: '0.00'),
+                  style: const TextStyle(color: Color(0xFFEAEAEA)),
+                  keyboardType: TextInputType.number,
+                  maxLines: 1,
                 ),
                 const SizedBox(height: 32),
 

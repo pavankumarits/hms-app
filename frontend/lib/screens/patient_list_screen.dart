@@ -36,28 +36,35 @@ class _PatientListScreenState extends State<PatientListScreen> {
           }
           
           final patients = snapshot.data!;
-          return ListView.builder(
-            itemCount: patients.length,
-            padding: const EdgeInsets.all(8),
-            itemBuilder: (context, index) {
-              final p = patients[index];
-              return Card(
-                margin: const EdgeInsets.only(bottom: 8),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.blue.shade100,
-                    child: Text(p.name[0].toUpperCase(), style: TextStyle(color: Colors.blue.shade800)),
-                  ),
-                  title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text("${p.patientUiid ?? 'Pending'} | ${p.phone ?? 'No Phone'}"),
-                  trailing: const Icon(Icons.more_vert),
-                  onTap: () {
-                     _showPatientActions(context, p);
-                  },
-                ),
-              );
+          return RefreshIndicator(
+            onRefresh: () async {
+              await SyncService(ApiService(), AppDatabase()).performSync(); // Trigger Sync
+              setState(() {}); // Reload UI
             },
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(), // Required for RefreshIndicator if list is small
+              itemCount: patients.length,
+              padding: const EdgeInsets.all(8),
+              itemBuilder: (context, index) {
+                final p = patients[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blue.shade100,
+                      child: Text(p.name[0].toUpperCase(), style: TextStyle(color: Colors.blue.shade800)),
+                    ),
+                    title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text("${p.patientUiid ?? 'Pending'} | ${p.phone ?? 'No Phone'}"),
+                    trailing: const Icon(Icons.more_vert),
+                    onTap: () {
+                       _showPatientActions(context, p);
+                    },
+                  ),
+                );
+              },
+            ),
           );
         },
       ),
