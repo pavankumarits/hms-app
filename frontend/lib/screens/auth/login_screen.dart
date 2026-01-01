@@ -37,8 +37,9 @@ class _LoginScreenState extends State<LoginScreen> {
             MaterialPageRoute(builder: (_) => const DashboardScreen())
         );
     } else if (mounted) {
+        String errorMessage = authProvider.lastError ?? 'Login Failed. Check credentials.';
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login Failed. Check credentials.')),
+            SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
         );
     }
   }

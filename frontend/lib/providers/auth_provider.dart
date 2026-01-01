@@ -16,6 +16,9 @@ class AuthProvider with ChangeNotifier {
   bool get isAuthenticated => _isAuthenticated;
   String? get role => _role;
   bool get isLoading => _isLoading;
+  String? get lastError => _lastError;
+
+  String? _lastError;
 
   Future<bool> login(String username, String password) async {
     _isLoading = true;
@@ -44,9 +47,11 @@ class AuthProvider with ChangeNotifier {
     } catch (e) {
       print('Login Error: $e');
       if (e is DioException) {
-         print('DioError: ${e.message}');
-         print('DioError Response: ${e.response?.data}');
+         _lastError = "Network Error: ${e.message} \nStatus: ${e.response?.statusCode}";
+      } else {
+         _lastError = "Error: $e";
       }
+      
       _isLoading = false;
       _isAuthenticated = false;
       notifyListeners();
