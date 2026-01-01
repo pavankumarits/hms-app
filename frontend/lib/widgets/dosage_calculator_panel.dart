@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../services/smart_doctor_service.dart';
 
 class DosageCalculatorPanel extends StatefulWidget {
   final String drugName;

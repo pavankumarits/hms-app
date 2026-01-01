@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../widgets/smart_rx_panel.dart';
 import '../widgets/lab_recommendation_panel.dart';
 import '../widgets/dosage_calculator_panel.dart';
-import '../widgets/dosage_calculator_panel.dart';
 import '../widgets/risk_assessment_panel.dart';
 import '../widgets/clinical_alert_panel.dart';
 import '../widgets/adverse_event_alert.dart';
@@ -22,20 +21,10 @@ class _SmartDoctorWorkbenchState extends State<SmartDoctorWorkbench> {
   List<Map<String, dynamic>> _diagnosisSuggestions = [];
   
   // Simulation: Patient Info
-  final int _patientAge = 45; // 3 years old for testing child dosage
-  final double _patientWeight = 15.0; // 15kg child
+  final int _patientAge = 45;
+  final double _patientWeight = 15.0;
   final List<String> _currentMeds = ["Simvastatin 20mg"];
   
-  // Risk State
-  Map<String, dynamic>? _riskData;
-  bool _loadingRisk = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchRisk();
-  }
-
   // Risk State & Alerts
   Map<String, dynamic>? _riskData;
   bool _loadingRisk = true;
