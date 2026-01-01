@@ -10,7 +10,7 @@ class PatientBase(BaseModel):
     address: Optional[str] = None
 
 class PatientCreate(PatientBase):
-    pass
+    patient_uiid: Optional[str] = None
 
 class PatientUpdate(PatientBase):
     pass
@@ -18,6 +18,7 @@ class PatientUpdate(PatientBase):
 class PatientInDBBase(PatientBase):
     id: str
     patient_uiid: str
+    hospital_id: Optional[str] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
 

@@ -9,18 +9,20 @@ class ApiService {
   
   ApiService() {
     _dio = Dio(BaseOptions(
-      // Default to Config, but will be overwritten by interceptor or init
-      baseUrl: AppConfig.apiBaseUrl, 
+      // Default to Config, but will be overwritten by interceptor or init if not hardcoded
+      baseUrl: AppConfig.useHardcodedUrl ? AppConfig.hardcodedUrl : AppConfig.apiBaseUrl, 
       connectTimeout: const Duration(seconds: 60),
       receiveTimeout: const Duration(seconds: 60),
     ));
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        // 1. Dynamic URL Overwrite
-        final savedUrl = await _storage.read(key: 'api_base_url');
-        if (savedUrl != null && savedUrl.isNotEmpty) {
-           options.baseUrl = savedUrl;
+        // 1. Dynamic URL Overwrite (Only if NOT using hardcoded)
+        if (!AppConfig.useHardcodedUrl) {
+            final savedUrl = await _storage.read(key: 'api_base_url');
+            if (savedUrl != null && savedUrl.isNotEmpty) {
+               options.baseUrl = savedUrl;
+            }
         }
 
         // Ensure /api/v1 suffix

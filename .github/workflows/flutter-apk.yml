@@ -29,12 +29,12 @@ jobs:
         working-directory: ./frontend
         run: flutter pub get
 
-      - name: Build Debug APK
+      - name: Build Release APK
         working-directory: ./frontend
-        run: flutter build apk --debug
+        run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: frontend/build/app/outputs/flutter-apk/app-debug.apk
+          name: app-release
+          path: frontend/build/app/outputs/flutter-apk/app-release.apk

@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../../services/database_helper.dart';
 import '../../services/sync_service.dart';
+import '../../services/api_service.dart';
+import '../../services/smart_doctor_service.dart';
 
 class AddVisitScreen extends StatefulWidget {
   final String? inputPatientId; // Optional: Pre-select if coming from list
@@ -67,7 +69,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
         await db.into(db.visits).insert(newVisit);
 
         // 3. Trigger Sync
-        // SyncService().performSync(); 
+        SyncService(ApiService(), db).performSync(); 
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -143,7 +145,13 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                 // Complaint
                 TextFormField(
                   controller: _complaintController,
-                  decoration: _cleanDecoration('Chief Complaint', Icons.sick),
+                  decoration: _cleanDecoration('Chief Complaint', Icons.sick).copyWith(
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.emergency, color: Colors.redAccent),
+                      tooltip: "Auto Triage",
+                      onPressed: () => _openTriageAssistant(context),
+                    ),
+                  ),
                   style: const TextStyle(color: Color(0xFFEAEAEA)),
                   maxLines: 1, 
                   validator: (val) => val!.trim().isEmpty ? 'Required' : null,
@@ -231,5 +239,111 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
       filled: true,
       fillColor: const Color(0xFF1E1E1E), // Dark Grey Surface
     );
+  }
+
+  void _openTriageAssistant(BuildContext context) {
+    // Local controllers for the dialog
+    final hrController = TextEditingController(text: "72");
+    final bpController = TextEditingController(text: "120"); // Systolic
+    final painController = TextEditingController(text: "0");
+    String consciousness = "Alert";
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        title: const Text("🚑 Smart Triage Assistant", style: TextStyle(color: Colors.white)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Enter quick vitals to assess urgency:", style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 16),
+              // HR
+              TextFormField(controller: hrController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "Heart Rate", filled: true, fillColor: Colors.black12, labelStyle: TextStyle(color: Colors.grey)), style: const TextStyle(color: Colors.white)),
+              const SizedBox(height: 8),
+              // BP
+              TextFormField(controller: bpController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "Systolic BP", filled: true, fillColor: Colors.black12, labelStyle: TextStyle(color: Colors.grey)), style: const TextStyle(color: Colors.white)),
+              const SizedBox(height: 8),
+              // Pain
+              TextFormField(controller: painController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "Pain Score (0-10)", filled: true, fillColor: Colors.black12, labelStyle: TextStyle(color: Colors.grey)), style: const TextStyle(color: Colors.white)),
+              const SizedBox(height: 16),
+              // Conciousness
+              DropdownButtonFormField<String>(
+                value: consciousness,
+                dropdownColor: Colors.black87,
+                items: ["Alert", "Confused", "Unresponsive"].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(color: Colors.white)))).toList(),
+                onChanged: (v) => consciousness = v!,
+                decoration: const InputDecoration(labelText: "Consciousness", filled: true, fillColor: Colors.black12, labelStyle: TextStyle(color: Colors.grey)),
+              )
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel")),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              _performTriage(context, 
+                _complaintController.text, 
+                double.tryParse(hrController.text) ?? 72, 
+                double.tryParse(bpController.text) ?? 120, 
+                int.tryParse(painController.text) ?? 0, 
+                consciousness
+              );
+            }, 
+            child: const Text("Analyze")
+          )
+        ],
+      ),
+    );
+  }
+
+  void _performTriage(BuildContext context, String symptoms, double hr, double sbp, int pain, String consciousness) async {
+     // Show Loading
+    showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
+    
+    final result = await SmartDoctorService().predictTriage(
+      symptoms: symptoms.isEmpty ? "General checkup" : symptoms,
+      vitals: {"heart_rate": hr, "systolic_bp": sbp},
+      painScore: pain,
+      consciousness: consciousness
+    );
+    
+    if (context.mounted) Navigator.pop(context); // Close loading
+
+    if (result != null && context.mounted) {
+      _showTriageResult(context, result);
+    } else if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Triage Failed. Check Backend.")));
+    }
+  }
+
+  void _showTriageResult(BuildContext context, Map<String, dynamic> result) {
+     final level = result['triage_level'];
+     final color = level <= 2 ? Colors.red : (level == 3 ? Colors.orange : Colors.green);
+
+     showDialog(context: context, builder: (_) => AlertDialog(
+       backgroundColor: const Color(0xFF1E1E1E),
+       title: Text("Triage: Level $level", style: TextStyle(color: color, fontWeight: FontWeight.bold)),
+       content: Column(
+         mainAxisSize: MainAxisSize.min,
+         crossAxisAlignment: CrossAxisAlignment.start,
+         children: [
+           Text("Category: ${result['category']}", style: const TextStyle(color: Colors.white, fontSize: 18)),
+           const SizedBox(height: 8),
+           Text("Wait Time: ${result['estimated_wait_time']}", style: const TextStyle(color: Colors.white70)),
+           const Divider(color: Colors.grey),
+           Text(result['reasoning'] ?? "", style: const TextStyle(color: Colors.white)),
+         ],
+       ),
+       actions: [
+         TextButton(onPressed: () {
+           // Append to diagnosis
+           _diagnosisController.text = "${_diagnosisController.text} [Triage Level $level: ${result['category']}]".trim(); 
+           Navigator.pop(context);
+         }, child: const Text("Add to Record")),
+       ],
+     ));
   }
 }

@@ -17,6 +17,7 @@ class VisitUpdate(VisitBase):
 
 class VisitInDBBase(VisitBase):
     id: str
+    hospital_id: Optional[str] = None
     patient_id: str
     doctor_id: str
     visit_date: datetime

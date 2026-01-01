@@ -1,0 +1,26 @@
+{
+  "patients": [
+    {
+      "id": "test-pat-001",
+      "hospital_id": "hosp-001",
+      "name": "John Doe",
+      "age": 30,
+      "gender": "Male",
+      "phone": "1234567890",
+      "patient_uiid": "JD-001",
+      "sync_status": "pending"
+    }
+  ],
+  "visits": [
+    {
+      "id": "test-vis-001",
+      "patient_id": "test-pat-001",
+      "hospital_id": "hosp-001",
+      "date": "2025-01-01T10:00:00Z",
+      "doctor_name": "Dr. Smith",
+      "chief_complaint": "Fever",
+      "diagnosis": "Viral Infection",
+      "total_amount": 500
+    }
+  ]
+}

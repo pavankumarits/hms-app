@@ -5,3 +5,5 @@ from app.models.visit import Visit
 from app.models.audit import AuditLog
 from app.models.file import File
 from app.models.bill import Bill
+from app.models.hospital import Hospital
+

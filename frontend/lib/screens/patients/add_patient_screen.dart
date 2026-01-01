@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../../services/database_helper.dart';
 import '../../services/sync_service.dart';
+import '../../services/api_service.dart';
 import 'package:provider/provider.dart'; // Assuming provider is available, or we pass instances
 
 class AddPatientScreen extends StatefulWidget {
@@ -42,11 +43,34 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
       try {
         final db = AppDatabase();
         final uuid = const Uuid().v4();
+        
+        // 1. Generate Sequential ID (P-YYYYMMDD-XXXX)
+        final now = DateTime.now();
+        final datePrefix = 'P${DateFormat('yyyyMMdd').format(now)}-'; // P20251227-
+        
+        // Get last ID for today
+        final lastId = await db.getLastPatientIdForDate(datePrefix);
+        
+        int nextSeq = 1;
+        if (lastId != null) {
+          // Parse "P20251227-0001" -> 0001
+          try {
+             final parts = lastId.split('-');
+             if (parts.isNotEmpty) {
+               nextSeq = int.parse(parts.last) + 1;
+             }
+          } catch (e) {
+            print("Error parsing ID sequence: $e");
+            // Fallback to 1 if parsing fails
+          }
+        }
+        
+        final newUiid = '$datePrefix${nextSeq.toString().padLeft(4, '0')}'; // P20251227-0001
 
-        // 1. Create Patient Object (Local)
+        // 2. Create Patient Object (Local)
         final newPatient = Patient(
           id: uuid,
-          patientUiid: 'P-${DateFormat('yyyyMMdd').format(DateTime.now())}-${uuid.substring(0, 4)}'.toUpperCase(), // Auto-generate readable ID
+          patientUiid: newUiid,
           name: _nameController.text.trim(),
           gender: _selectedGender,
           dob: _selectedDob,
@@ -62,7 +86,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
 
         // 3. Trigger Background Sync (Fire and Forget)
         // We catch errors silently here so UI doesn't freeze
-        // SyncService().performSync(); // Pass context/instance if needed
+        SyncService(ApiService(), db).performSync();
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

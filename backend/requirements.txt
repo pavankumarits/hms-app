@@ -8,4 +8,15 @@ python-jose[cryptography]
 passlib[bcrypt]
 argon2-cffi
 python-multipart
+asyncpg
+ujson
+gunicorn
+psycopg2-binary
 aiofiles
+python-dotenv
+greenlet
+scikit-learn
+pandas
+numpy
+sentence-transformers
+torch

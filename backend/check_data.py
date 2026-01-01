@@ -28,12 +28,17 @@ try:
     v_count = cursor.fetchone()[0]
     print(f"Total Visits: {v_count}")
     
-    if count > 0:
-        cursor.execute("SELECT id, name, patient_uiid FROM patients LIMIT 5")
+    if p_count > 0:
+        cursor.execute("SELECT name, patient_uiid, dob, phone, sync_status FROM patients LIMIT 5")
         rows = cursor.fetchall()
-        print("Sample Data:")
+        print("\n--- Current Patients Data ---")
         for row in rows:
-            print(row)
+            print(f"Name: {row[0]}")
+            print(f"ID:   {row[1]}")
+            print(f"DOB:  {row[2]}")
+            print(f"Phone:{row[3]}")
+            print(f"Sync: {row[4]}")
+            print("-" * 20)
     
     conn.close()
 

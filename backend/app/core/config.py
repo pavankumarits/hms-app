@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from typing import Optional
+from pydantic import validator
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Hospital Management System"
@@ -19,9 +20,19 @@ class Settings(BaseSettings):
 
     # Database
     # Format: mysql+aiomysql://user:password@host/db_name
-    DATABASE_URL: str = "mysql+aiomysql://root:password@localhost/hms_db"
+    DATABASE_URL: str = "postgresql+asyncpg://user:password@host:port/dbname"
+
+    @validator("DATABASE_URL", pre=True)
+    def assemble_db_connection(cls, v: Optional[str]) -> str:
+        if isinstance(v, str):
+            if v.startswith("postgresql://"):
+                v = v.replace("postgresql://", "postgresql+asyncpg://")
+            if "sslmode=require" in v:
+                v = v.replace("sslmode=require", "ssl=require")
+        return v
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 settings = Settings()

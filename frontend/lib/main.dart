@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/theme.dart';
-import 'screens/auth/login_screen.dart';
-import 'providers/auth_provider.dart';
+import 'screens/smart_doctor_workbench.dart';
 
-import 'services/database_helper.dart';
+// ... (inside HMSApp)
+        home: const SmartDoctorWorkbench(),
 import 'services/api_service.dart';
 import 'services/sync_service.dart';
 
@@ -23,7 +23,11 @@ void main() async {
   // Check Configuration
   const storage = FlutterSecureStorage();
   final hospitalId = await storage.read(key: 'hospital_id');
-  final isConfigured = hospitalId != null;
+  
+  // If Hardcoded URL is used, we treat the app as "configured" for server connection
+  // However, we still need hospital info. For multi-tenant, login handles hospital ID.
+  // So we can skip SetupScreen if we just need the URL.
+  final isConfigured = AppConfig.useHardcodedUrl || (hospitalId != null);
   
   runApp(HMSApp(isConfigured: isConfigured));
 }
@@ -44,7 +48,7 @@ class HMSApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,
-        home: isConfigured ? const LoginScreen() : const SetupScreen(),
+        home: const SmartDoctorWorkbench(),
       ),
     );
   }

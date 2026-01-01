@@ -5,6 +5,7 @@ import '../services/sync_service.dart'; // Added
 import '../services/database_helper.dart'; // Added
 import '../core/theme.dart';
 import 'patient_list_screen.dart';
+import 'dashboard/analytics_dashboard_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -194,6 +195,23 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 4,
                   shadowColor: Theme.of(context).primaryColor.withOpacity(0.4),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Analytics Button (New)
+            SizedBox(
+              height: 56,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.insights, size: 24, color: Colors.indigo),
+                label: const Text("Hospital Analytics", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.indigo)),
+                onPressed: () {
+                   Navigator.push(context, MaterialPageRoute(builder: (_) => const AnalyticsDashboardScreen()));
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.indigo),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
             ),

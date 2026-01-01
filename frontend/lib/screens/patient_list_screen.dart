@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/database_helper.dart';
 import '../services/sync_service.dart';
 import '../services/api_service.dart';
+import '../services/smart_doctor_service.dart';
 import 'patients/add_patient_screen.dart'; // Correct path
 import 'visits/add_visit_screen.dart';
 import 'patients/patient_history_screen.dart';
@@ -117,8 +118,92 @@ class _PatientListScreenState extends State<PatientListScreen> {
                  },
               ),
             ),
+            const SizedBox(height: 12),
+
+            // 3. AI Risk Analysis (New)
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.analytics_outlined, color: Colors.purple),
+                label: const Text("Run AI Risk Analysis"),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.purple,
+                  side: const BorderSide(color: Colors.purple),
+                  padding: const EdgeInsets.all(16)
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _runRiskAnalysis(context, p);
+                },
+              ),
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _runRiskAnalysis(BuildContext context, Patient p) async {
+    // Show Loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    // Calculate Age
+    final age = DateTime.now().year - p.dob.year;
+    
+    // Call AI Service
+    // Note: Using default vitals for static demographic check. 
+    // In a real scenario, we would fetch the latest visit's vitals.
+    final result = await SmartDoctorService().predictPatientRisk(
+      age: age,
+      gender: p.gender,
+      vitals: {"systolic_bp": 120, "heart_rate": 72}, 
+      comorbidities: [], 
+    );
+
+    Navigator.pop(context); // Close loading
+
+    if (result != null) {
+      if (mounted) _showRiskResult(context, result);
+    } else {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("AI Analysis Failed. Check Backend.")));
+    }
+  }
+
+  void _showRiskResult(BuildContext context, Map<String, dynamic> result) {
+    final color = result['risk_level'] == 'High' ? Colors.red : (result['risk_level'] == 'Medium' ? Colors.orange : Colors.green);
+    
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("🤖 AI Risk Prediction"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              backgroundColor: color.withOpacity(0.2),
+              radius: 30,
+              child: Icon(Icons.health_and_safety, color: color, size: 30),
+            ),
+            const SizedBox(height: 16),
+            Text("Risk Level: ${result['risk_level']}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+            const SizedBox(height: 8),
+            Text("Score: ${(result['risk_score'] * 100).toStringAsFixed(1)}%"),
+            const SizedBox(height: 8),
+            Text(result['recommendation'] ?? "", textAlign: TextAlign.center),
+            if (result['risk_factors'] != null) ...[
+               const Divider(),
+               const Align(alignment: Alignment.centerLeft, child: Text("Risk Factors:", style: TextStyle(fontWeight: FontWeight.bold))),
+               ...(result['risk_factors'] as List).map((e) => Align(alignment: Alignment.centerLeft, child: Text("• $e"))).toList(),
+            ]
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK")),
+        ],
       ),
     );
   }

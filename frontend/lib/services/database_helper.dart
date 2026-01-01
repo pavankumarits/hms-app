@@ -60,6 +60,21 @@ class AppDatabase extends _$AppDatabase {
   // CRUD Operations
   Future<List<Patient>> getAllPatients() => select(patients).get();
   Future<int> insertPatient(Patient patient) => into(patients).insert(patient);
+
+  // Sequence Generation
+  Future<String?> getLastPatientIdForDate(String prefix) async {
+    // Query for IDs starting with "P20251227-"
+    // sort by id desc? drift might not sort by string perfectly if length differs, but fixed length is fine.
+    // simpler: get all matching, manual max. Or SQL LIKE?
+    // drift has 'like'.
+    final query = select(patients)
+      ..where((tbl) => tbl.patientUiid.like('$prefix%'))
+      ..orderBy([(t) => OrderingTerm(expression: t.patientUiid, mode: OrderingMode.desc)])
+      ..limit(1);
+    
+    final result = await query.getSingleOrNull();
+    return result?.patientUiid;
+  }
   
   // Sync Query
   Future<List<Patient>> getPendingPatients() => (select(patients)..where((tbl) => tbl.syncStatus.equals('pending'))).get();

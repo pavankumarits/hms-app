@@ -128,18 +128,30 @@ async def sync_data(
     Bulk sync endpoint. Tries DB first. 
     If DB unavailable (Exception), saves to In-Memory Queue (202 Accepted).
     """
+    # Inject hospital_id from current_user into payload
+    # This ensures backend enforces data ownership and validates NOT NULL constraints
+    hid = current_user.hospital_id
+    
+    if payload.patients:
+        for p in payload.patients:
+            p.hospital_id = hid
+            
+    if payload.visits:
+        for v in payload.visits:
+            v.hospital_id = hid
+
+    if payload.bills:
+         for b in payload.bills:
+             # Assuming Bill schema also needs update, but let's handle if it has the field
+             if hasattr(b, 'hospital_id'):
+                 b.hospital_id = hid
+
     try:
         await process_sync_payload_internal(db, payload)
         return {"status": "success", "message": "Data synced successfully"}
     except Exception as e:
         # DB Error?
         print(f"Sync DB Error (Fallback to Queue): {str(e)}")
-        # Add to Queue
+        # Add to Queue (Payload now has hospital_id injected)
         add_to_queue(payload)
-        # Return success (Accepted) so Frontend clears pending status?
-        # OR Return 202.
-        # IF we return 200, frontend marks as synced. 
-        # IF the backend queue is ephemeral (Render), this is risky.
-        # Compliance with "If tunnel/DB down... Accept API request".
-        # So we MUST return success-like status.
         return {"status": "accepted", "message": "Data queued for processing (DB unavailable)"}
