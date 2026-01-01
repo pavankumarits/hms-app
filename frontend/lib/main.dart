@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'core/theme.dart';
+import 'core/config.dart';
 import 'screens/smart_doctor_workbench.dart';
-
-// ... (inside HMSApp)
-        home: const SmartDoctorWorkbench(),
+import 'screens/setup_screen.dart';
+import 'screens/auth/login_screen.dart';
 import 'services/api_service.dart';
 import 'services/sync_service.dart';
-
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'screens/setup_screen.dart';
+import 'services/database_helper.dart';
+import 'providers/auth_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,7 +48,7 @@ class HMSApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,
-        home: const SmartDoctorWorkbench(),
+        home: isConfigured ? const LoginScreen() : const SetupScreen(),
       ),
     );
   }
