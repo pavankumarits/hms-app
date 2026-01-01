@@ -45,6 +45,9 @@ class ApiService {
         if (hospitalId != null) {
           options.headers['X-Hospital-ID'] = hospitalId;
         }
+
+        // Bypass Ngrok Browser Warning
+        options.headers['ngrok-skip-browser-warning'] = 'true';
         
         return handler.next(options);
       },
