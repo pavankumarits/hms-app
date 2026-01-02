@@ -1,16 +1,27 @@
-from sqlalchemy import create_engine, text
-from app.core.config import settings
+import asyncio
+import sys
+import os
 
-# Force pymysql
-url = settings.DATABASE_URL.replace("+aiomysql", "+pymysql")
-if "+pymysql" not in url and "+aiomysql" not in settings.DATABASE_URL:
-    url = url.replace("mysql://", "mysql+pymysql://")
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(backend_dir)
 
-engine = create_engine(url)
+from dotenv import load_dotenv
+load_dotenv(os.path.join(backend_dir, ".env"))
 
-with engine.connect() as conn:
-    result = conn.execute(text("SELECT username, role, hospital_id, is_active FROM users"))
-    users = result.fetchall()
-    print(f"Found {len(users)} users:")
-    for u in users:
-        print(f"User: {u.username}, Role: {u.role}, Active: {u.is_active}")
+from app.db.session import AsyncSessionLocal
+from app.models.user import User
+from sqlalchemy import select
+
+async def list_users():
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(User))
+        users = result.scalars().all()
+        print(f"Total Users: {len(users)}")
+        for u in users:
+            print(f" - User: {u.username}, Role: {u.role}, Active: {u.is_active}")
+            
+        if not users:
+            print("❌ NO USERS FOUND. Database is empty.")
+
+if __name__ == "__main__":
+    asyncio.run(list_users())

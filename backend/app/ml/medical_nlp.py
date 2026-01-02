@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Any
 import logging
 
 try:
@@ -15,6 +15,7 @@ class MedicalNLP:
     """
     
     def __init__(self):
+        global HAS_NLP
         self.model = None
         self.diagnosis_corpus = []
         self.corpus_embeddings = None

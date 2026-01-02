@@ -8,10 +8,8 @@ from app.ml.readmission_model import readmission_predictor
 from app.ml.anomaly_detector import anomaly_detector
 from app.ml.triage_classifier import triage_classifier
 from app.ml.analytics_engine import analytics_engine
-from app.ml.medical_nlp import medical_nlp
-from app.ml.risk_predictor import risk_predictor
-from app.ml.readmission_model import readmission_predictor
-from app.ml.triage_classifier import triage_classifier
+
+router = APIRouter()
 
 # ... imports ...
 
@@ -185,8 +183,6 @@ from app.api import deps
 # In a real app, we'd import models to save prediction to DB
 # from app.models.ml import MLRiskPrediction 
 # from sqlalchemy.ext.asyncio import AsyncSession
-
-router = APIRouter()
 
 # --- Schemas ---
 
