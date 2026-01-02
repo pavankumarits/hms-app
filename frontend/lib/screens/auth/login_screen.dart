@@ -128,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 24),
               const Center(
                 child: Text(
-                  "Version: 1.0.1 (Fixed Ngrok)",
+                  "Version: 1.0.2 (Local Hotspot)",
                   style: TextStyle(color: Colors.grey, fontSize: 12),
                 ),
               ),
