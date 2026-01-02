@@ -1,8 +1,8 @@
 class AppConfig {
   // ---------------------------------------------------------------------------
-  // Static ngrok dev domain - PERMANENT (won't change)
+  // Local WiFi IP - Use when phone is on SAME WiFi as laptop
   // ---------------------------------------------------------------------------
-  static const String hardcodedUrl = "https://nonenunciative-jadon-deucedly.ngrok-free.dev";
+  static const String hardcodedUrl = "http://10.63.158.120:8000";
   
   // Set this to true to SKIP the "Server URL" screen forever
   // Set to false if you want to manually enter it on the phone
